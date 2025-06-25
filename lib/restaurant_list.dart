@@ -8,6 +8,30 @@ import 'login.dart';
 
 
 class RestaurantsPage extends StatefulWidget {
+  final bool isFromSearch;
+  final List<String>? cuisines;
+  final DateTime? date;
+  final String location;
+  final double minPrice;
+  final double maxPrice;
+  final TimeOfDay? time;
+  final int nbrGuests;
+  final List<String>? dietaryOptions;
+  final List<String>? specialFeatures;
+
+  const RestaurantsPage({
+    Key? key,
+    this.isFromSearch = false,
+    this.location = "",
+    this.cuisines,
+    this.date,
+    this.minPrice = 0,
+    this.maxPrice = 0,
+    this.time,
+    this.nbrGuests = 0,
+    this.specialFeatures,
+    this.dietaryOptions,
+  }) : super(key: key);
   @override
   _RestaurantsPageState createState() => _RestaurantsPageState();
 }
@@ -24,7 +48,13 @@ class _RestaurantsPageState extends State<RestaurantsPage> {
 
   Future<void> _loadRestaurants() async {
     try {
-      final _restaurants = await Api.fetchRestaurants();
+      var _restaurants;
+      if(widget.isFromSearch){
+        var pdata = {"date": widget.date, "time": widget.time, "minPrice": widget.minPrice, "maxPrice": widget.maxPrice, "location": widget.location, "cuisines": widget.cuisines,"specialFeatures": widget.specialFeatures,"dietaryOptions": widget.dietaryOptions,"nbrGuests": widget.nbrGuests};
+        _restaurants = await Api.searchRestaurants(pdata);
+      }else{
+        _restaurants = await Api.fetchRestaurants();
+      }
       setState(() {
         restaurants = _restaurants;
         isLoading = false;

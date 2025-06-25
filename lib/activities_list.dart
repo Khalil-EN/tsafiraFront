@@ -6,6 +6,28 @@ import 'login.dart';
 import 'exceptions/session_expired_exception.dart';
 
 class ActivitiesPage extends StatefulWidget {
+  final bool isFromSearch;
+  final List<String>? activityTypes;
+  final DateTime? date;
+  final String location;
+  final TimeOfDay? time;
+  final int participants;
+  final bool freeOnly;
+  final List<String>? ageGroups;
+  final List<String>? specialRequirements;
+
+  const ActivitiesPage({
+    Key? key,
+    this.isFromSearch = false,
+    this.location = "",
+    this.activityTypes,
+    this.date,
+    this.time,
+    this.participants = 0,
+    this.specialRequirements,
+    this.ageGroups,
+    this.freeOnly = false,
+  }) : super(key: key);
   @override
   _ActivitiesPageState createState() => _ActivitiesPageState();
 }
@@ -47,7 +69,13 @@ class _ActivitiesPageState extends State<ActivitiesPage> {
 
   Future<void> _loadActivities() async {
     try {
-      final _activities = await Api.fetchActivities();
+      var _activities;
+      if(widget.isFromSearch){
+        var pdata = {"date": widget.date, "time": widget.time, "freeOnly": widget.freeOnly, "location": widget.location, "activityTypes": widget.activityTypes,"specialRequirements": widget.specialRequirements,"ageGroups": widget.ageGroups,"participants": widget.participants};
+        _activities = await Api.searchActivities(pdata);
+      }else{
+        _activities = await Api.fetchActivities();
+      }
       setState(() {
         activities2 = _activities;
         isLoading = false;

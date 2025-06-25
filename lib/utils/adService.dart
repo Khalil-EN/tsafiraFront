@@ -1,4 +1,4 @@
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+/*import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class AdService {
   late RewardedAd _rewardedAd;
@@ -42,4 +42,4 @@ class AdService {
       ),
     );
   }
-}
+}*/

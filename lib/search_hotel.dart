@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:table_calendar_example/hotel_list.dart';
+import 'services/api.dart';
 
 class SearchHotel extends StatefulWidget {
   @override
@@ -334,8 +336,17 @@ class _SearchHotelState extends State<SearchHotel> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Implement search functionality
+                    onPressed: () async {
+                      //var pdata = {"checkInDate": _checkInDate, "checkOutDate": _checkOutDate, "minPrice": _minPriceController, "maxPrice": _maxPriceController, "location": _locationController};
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => HotelsPage(isFromSearch: true,
+                          checkInDate: _checkInDate,
+                          checkOutDate: _checkOutDate,
+                          minPrice: _moneyRange.start,
+                          maxPrice: _moneyRange.end,
+                          location: "Rabat",)),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

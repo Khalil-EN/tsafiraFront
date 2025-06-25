@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import "restaurant_list.dart";
 
 class SearchRestaurant extends StatefulWidget {
   @override
@@ -21,7 +22,7 @@ class _SearchRestaurantState extends State<SearchRestaurant> {
   // Cuisine type selection
   List<String> _cuisineTypes = [
     'Italian', 'Mexican', 'Chinese', 'Indian', 
-    'Seafood', 'Vegetarian', 'BBQ', 'Fast Food'
+    'Seafood', 'Vegetarian', 'BBQ', 'Fast-Food'
   ];
   List<String> _selectedCuisines = [];
 
@@ -395,8 +396,20 @@ class _SearchRestaurantState extends State<SearchRestaurant> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Implement search functionality
-                      _performSearch();
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RestaurantsPage(isFromSearch: true,
+                          location: _locationController.text,
+                          date: _selectedDate,
+                          time: _selectedTime,
+                          nbrGuests: _guestCount,
+                          minPrice: _priceRange.start,
+                          maxPrice: _priceRange.end,
+                          cuisines: _selectedCuisines,
+                          dietaryOptions: _selectedDietaryOptions,
+                          specialFeatures: _selectedSpecialFeatures,)),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

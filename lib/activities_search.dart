@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import "activities_list.dart";
 
 class SearchActivities extends StatefulWidget {
   @override
@@ -22,7 +23,7 @@ class _SearchActivitiesState extends State<SearchActivities> {
   List<String> _activityTypes = [
     'Outdoor', 'Cultural', 'Sports', 'Educational', 
     'Art', 'Music', 'Adventure', 'Family-Friendly', 
-    'Fitness', 'Workshop'
+    'Fitness', 'Workshop','Beach','Museums'
   ];
   List<String> _selectedActivityTypes = [];
 
@@ -308,8 +309,18 @@ class _SearchActivitiesState extends State<SearchActivities> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Implement search functionality
-                      _performSearch();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ActivitiesPage(isFromSearch: true,
+                          location: _locationController.text,
+                          date: _selectedDate,
+                          time: _selectedTime,
+                          participants: _participantCount,
+                          freeOnly: _onlyFreeBool,
+                          activityTypes: _selectedActivityTypes,
+                          ageGroups: _selectedAgeGroups,
+                          specialRequirements: _selectedSpecialRequirements,)),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

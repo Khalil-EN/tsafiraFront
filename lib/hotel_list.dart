@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'hotel_details.dart';
 import 'search_hotel.dart';
@@ -8,9 +9,27 @@ import 'login.dart';
 
 
 class HotelsPage extends StatefulWidget {
+  final bool isFromSearch;
+  final DateTime? checkInDate;
+  final DateTime? checkOutDate;
+  final String location;
+  final double minPrice;
+  final double maxPrice;
+
+  const HotelsPage({
+    Key? key,
+    this.isFromSearch = false,
+    this.location = "",
+    this.checkInDate,
+    this.checkOutDate,
+    this.minPrice = 0,
+    this.maxPrice = 0,
+  }) : super(key: key);
+
   @override
   _HotelsPageState createState() => _HotelsPageState();
 }
+
 
 class _HotelsPageState extends State<HotelsPage> {
   List<Map<String, dynamic>> hotels = [];
@@ -23,7 +42,13 @@ class _HotelsPageState extends State<HotelsPage> {
 
   Future<void> _loadHotels() async {
     try {
-      final _hotels = await Api.fetchHotels();
+      var _hotels;
+      if(widget.isFromSearch){
+        var pdata = {"checkInDate": widget.checkInDate, "checkOutDate": widget.checkOutDate, "minPrice": widget.minPrice, "maxPrice": widget.maxPrice, "location": widget.location};
+        _hotels = await Api.searchHotels(pdata);
+      }else{
+        _hotels = await Api.fetchHotels();
+      }
       print(_hotels);
       setState(() {
         hotels = _hotels;

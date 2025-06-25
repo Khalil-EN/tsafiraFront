@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 //import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import  'package:http/http.dart' as http;
 import 'dart:io';
 import '../utils/secure_storage.dart';
@@ -10,7 +11,7 @@ import "../exceptions/session_expired_exception.dart";
 
 class Api {
   static final _storage = FlutterSecureStorage();
-  static const baseUrl = 'http://10.0.2.2:8000/api/'; //10.0.0.2
+  static const baseUrl = 'http://192.168.1.84:8000/api/'; //10.0.0.2
   static helloWorld() async{
 
     var url = Uri.parse("${baseUrl}hello_world");
@@ -226,6 +227,149 @@ class Api {
       throw Exception('Failed to load data');
     }
   }
+  static Future<List<Map<String, dynamic>>> searchHotels(Map pdata) async{
+    String? token = await _storage.read(key: 'accessToken');
+    String? refreshToken = await _storage.read(key: 'refreshToken');
+
+    final payload = {
+      "checkInDate": (pdata["checkInDate"] as DateTime?)?.toIso8601String(),
+      "checkOutDate": (pdata["checkOutDate"] as DateTime?)?.toIso8601String(),
+      "minPrice": pdata["minPrice"],
+      "maxPrice": pdata["maxPrice"],
+      "location": pdata["location"],
+    };
+
+
+    Future<http.Response> fetchWithToken(String? token) {
+      return http.post(
+        Uri.parse("${baseUrl}search/hotels"),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: json.encode(payload),
+      );
+    }
+
+    http.Response response = await fetchWithToken(token);
+
+    if (response.statusCode == 403 && refreshToken != null) {
+      // Access token expired, attempt to refresh
+      final refreshed = await _refreshAccessToken(refreshToken);
+      if (refreshed) {
+        token = await _storage.read(key: 'accessToken');
+        response = await fetchWithToken(token); // Retry with new access token
+      } else {
+        throw SessionExpiredException('Session expired. Please log in again.');
+      }
+    }
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> searchRestaurants(Map pdata) async{
+    String? token = await _storage.read(key: 'accessToken');
+    String? refreshToken = await _storage.read(key: 'refreshToken');
+
+    final payload = {
+      "date": (pdata["date"] as DateTime?)?.toIso8601String(),
+      "time": (pdata["time"] as TimeOfDay?) != null
+          ? "${pdata["time"].hour.toString().padLeft(2, '0')}:${pdata["time"].minute.toString().padLeft(2, '0')}"
+          : null,
+      "minPrice": pdata["minPrice"],
+      "maxPrice": pdata["maxPrice"],
+      "location": pdata["location"],
+      "nbrGuests": pdata["nbrGuests"],
+      "dietaryOptions": pdata["dietaryOptions"],
+      "specialFeatures": pdata["specialFeatures"],
+      "cuisines": pdata["cuisines"],
+    };
+
+
+    Future<http.Response> fetchWithToken(String? token) {
+      return http.post(
+        Uri.parse("${baseUrl}search/restaurants"),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: json.encode(payload),
+      );
+    }
+
+    http.Response response = await fetchWithToken(token);
+
+    if (response.statusCode == 403 && refreshToken != null) {
+      // Access token expired, attempt to refresh
+      final refreshed = await _refreshAccessToken(refreshToken);
+      if (refreshed) {
+        token = await _storage.read(key: 'accessToken');
+        response = await fetchWithToken(token); // Retry with new access token
+      } else {
+        throw SessionExpiredException('Session expired. Please log in again.');
+      }
+    }
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> searchActivities(Map pdata) async{
+    String? token = await _storage.read(key: 'accessToken');
+    String? refreshToken = await _storage.read(key: 'refreshToken');
+
+    final payload = {
+      "date": (pdata["date"] as DateTime?)?.toIso8601String(),
+      "time": (pdata["time"] as TimeOfDay?) != null
+          ? "${pdata["time"].hour.toString().padLeft(2, '0')}:${pdata["time"].minute.toString().padLeft(2, '0')}"
+          : null,
+      "freeOnly": pdata["freeOnly"],
+      "location": pdata["location"],
+      "participants": pdata["participants"],
+      "ageGroups": pdata["ageGroups"],
+      "specialRequirements": pdata["specialRequirements"],
+      "activityTypes": pdata["activityTypes"],
+    };
+
+
+    Future<http.Response> fetchWithToken(String? token) {
+      return http.post(
+        Uri.parse("${baseUrl}search/activities"),
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null) 'Authorization': 'Bearer $token',
+        },
+        body: json.encode(payload),
+      );
+    }
+
+    http.Response response = await fetchWithToken(token);
+
+    if (response.statusCode == 403 && refreshToken != null) {
+      // Access token expired, attempt to refresh
+      final refreshed = await _refreshAccessToken(refreshToken);
+      if (refreshed) {
+        token = await _storage.read(key: 'accessToken');
+        response = await fetchWithToken(token); // Retry with new access token
+      } else {
+        throw SessionExpiredException('Session expired. Please log in again.');
+      }
+    }
+
+    if (response.statusCode == 200) {
+      return List<Map<String, dynamic>>.from(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load data: ${response.statusCode}');
+    }
+  }
+
   static Future<bool> _refreshAccessToken(String refreshToken) async {
     final response = await http.post(
       Uri.parse('${baseUrl}refresh'),
